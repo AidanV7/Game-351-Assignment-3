@@ -76,13 +76,9 @@ public class PlayerController : MonoBehaviour
 
     void PerformKick()
     {
-        if (kickPoint == null) return;
+        Vector3 kickCenter = transform.position + transform.forward * 1.5f;
 
-        Collider[] hits = Physics.OverlapSphere(
-            kickPoint.position,
-            kickRange,
-            kickableLayer
-        );
+        Collider[] hits = Physics.OverlapSphere(kickCenter, 1.5f);
 
         foreach (Collider hit in hits)
         {
@@ -90,17 +86,10 @@ public class PlayerController : MonoBehaviour
 
             if (rb != null && !rb.isKinematic)
             {
-                Vector3 direction =
-                    (hit.transform.position - transform.position).normalized;
+                Vector3 forceDir = (hit.transform.position - transform.position).normalized;
+                forceDir.y = 0.3f;
 
-                // Make sure object is in front of player
-                if (Vector3.Dot(transform.forward, direction) > 0.5f)
-                {
-                    rb.AddForce(
-                        direction * kickForce,
-                        ForceMode.Impulse
-                    );
-                }
+                rb.AddForce(forceDir * kickForce, ForceMode.Impulse);
             }
         }
     }
