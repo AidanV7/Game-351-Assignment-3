@@ -134,7 +134,7 @@ MonoBehaviour:
   lifeTime: 10
   explosionPrefab: {fileID: 784801271038223420, guid: 2c1588b5e67a1a64c91c6231e90c8a76,
     type: 3}
-  debrisPrefab: {fileID: 1056188262598134, guid: acfc3f18ab8d9a248be87ceb836969bb,
+  debrisPrefab: {fileID: 1056188262598134, guid: 6c46190a04ac36045bab57473e2bb033,
     type: 3}
 --- !u!136 &7845911128046179388
 CapsuleCollider:
