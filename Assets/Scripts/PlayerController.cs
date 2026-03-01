@@ -4,18 +4,18 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    public float impulseForce  = 5000.0f;    
-    public float impulseTorque = 3000.0f;
+    public float impulseForce = 5000f;
+    public float impulseTorque = 3000f;
 
-    [Header("Footstep Settings")]
-    public float footstepInterval = 0.5f;  
-    private float footstepTimer = 0f;
+    [Header("Footsteps")]
+    public float footstepInterval = 0.5f;
+    private float footTimer = 0f;
 
-    [Header("Kick Settings")]
-    public float kickForce = 10f;            
-    public float kickRange = 2f;             
-    public Transform kickPoint;              
-    public LayerMask kickableLayer;          
+    [Header("Kick")]
+    public float kickForce = 10f;
+    public float kickRange = 2f;
+    public Transform kickPoint;
+    public LayerMask kickables;
 
     [Header("Shooting")]
     public GameObject bulletPrefab;
@@ -24,103 +24,94 @@ public class PlayerController : MonoBehaviour
 
     public GameObject hero;
 
-    private Animator animController;
-    private Rigidbody rigidBody;
-
-    private float nextFireTime = 0f;
+    private Animator anim;
+    private Rigidbody rb;
+    private float nextFire = 0f;
 
     void Start()
     {
-        animController = hero.GetComponent<Animator>();
-        rigidBody      = GetComponent<Rigidbody>();
+        anim = hero.GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
     }
 
     void Update()
     {
-        HandleMovement();
-        HandleCrouch();
-        HandleKick();
-        HandleShooting();
+        Move();
+        Crouch();
+        Kick();
+        Shoot();
     }
 
-    void HandleMovement()
+    void Move()
     {
         Vector3 input = new Vector3(0, Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        bool isWalking = input.magnitude > 0.001f && !animController.GetBool("Crouch");
+        bool walking = input.magnitude > 0.001f && !anim.GetBool("Crouch");
 
-        if (isWalking)
+        if (walking)
         {
-            rigidBody.AddRelativeTorque(new Vector3(0, input.y * impulseTorque * Time.deltaTime, 0));
-            rigidBody.AddRelativeForce(new Vector3(0, 0, input.z * impulseForce * Time.deltaTime));
+            rb.AddRelativeTorque(0, input.y * impulseTorque * Time.deltaTime, 0);
+            rb.AddRelativeForce(0, 0, input.z * impulseForce * Time.deltaTime);
+            anim.SetBool("Walk", true);
 
-            animController.SetBool("Walk", true);
-
-            // Footstep sound
-            footstepTimer -= Time.deltaTime;
-            if (footstepTimer <= 0f)
+            footTimer -= Time.deltaTime;
+            if (footTimer <= 0f)
             {
                 SoundManager.Instance.PlayWalking(transform.position);
-                footstepTimer = footstepInterval;
+                footTimer = footstepInterval;
             }
         }
         else
         {
-            animController.SetBool("Walk", false);
-            footstepTimer = 0f; // reset timer
+            anim.SetBool("Walk", false);
+            footTimer = 0f;
         }
     }
 
-    void HandleCrouch()
+    void Crouch()
     {
-        animController.SetBool("Crouch", Input.GetKey(KeyCode.C));
+        anim.SetBool("Crouch", Input.GetKey(KeyCode.C));
     }
 
-    void HandleKick()
+    void Kick()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            int randKick = Random.Range(0, 3);
-            animController.SetInteger("KickType", randKick);
-            animController.SetTrigger("Kick");
+            anim.SetInteger("KickType", Random.Range(0, 3));
+            anim.SetTrigger("Kick");
         }
     }
 
     void PerformKick()
     {
-        Vector3 kickCenter = transform.position + transform.forward * kickRange;
-        Collider[] hits = Physics.OverlapSphere(kickCenter, kickRange, kickableLayer);
+        Vector3 center = transform.position + transform.forward * kickRange;
+        Collider[] hits = Physics.OverlapSphere(center, kickRange, kickables);
 
         foreach (Collider hit in hits)
         {
-            Rigidbody rb = hit.attachedRigidbody;
-            if (rb != null && !rb.isKinematic)
+            Rigidbody hitRb = hit.attachedRigidbody;
+            if (hitRb != null && !hitRb.isKinematic)
             {
-                Vector3 forceDir = (hit.transform.position - transform.position).normalized;
-                forceDir.y = 0.3f;
-                rb.AddForce(forceDir * kickForce, ForceMode.Impulse);
+                Vector3 dir = (hit.transform.position - transform.position).normalized;
+                dir.y = 0.3f;
+                hitRb.AddForce(dir * kickForce, ForceMode.Impulse);
             }
         }
     }
 
-    void HandleShooting()
+    void Shoot()
     {
-        if (Input.GetKeyDown(KeyCode.F) && Time.time >= nextFireTime)
+        if (Input.GetKeyDown(KeyCode.F) && Time.time >= nextFire)
         {
-            nextFireTime = Time.time + fireRate;
-            animController.SetTrigger("Shoot");
-
-            // Instantiate bullet
-            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-
-            // Play gunshot sound
+            nextFire = Time.time + fireRate;
+            anim.SetTrigger("Shoot");
+            Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
             SoundManager.Instance.PlayGunshot(firePoint.position);
         }
     }
 
-    // Optional: visualize kick range
     void OnDrawGizmosSelected()
     {
-        if (kickPoint != null)
+        if (kickPoint)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(kickPoint.position, kickRange);

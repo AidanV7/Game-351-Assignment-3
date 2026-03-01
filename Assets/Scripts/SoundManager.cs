@@ -1,75 +1,51 @@
-using System.Collections;
 using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance;
 
-    [Header("Ambient Sound")]
+    [Header("Ambient")]
     public AudioClip ambientClip;
-    [Range(0f, 1f)] public float ambientVolume = 0.3f;
+    [Range(0,1)] public float ambientVol = 0.3f;
 
-    [Header("Dynamic Music Tracks")]
-    public AudioClip defaultTrack;
-    public AudioClip suspenseTrack;
-    public AudioClip fightTrack;
-    [Range(0f, 1f)] public float musicVolume = 0.5f;
+    [Header("Music")]
+    public AudioClip defaultTrack, suspenseTrack, fightTrack;
+    [Range(0,1)] public float musicVol = 0.5f;
 
-    [Header("Gun & Explosions")]
-    public AudioClip gunshotClip;
-    public AudioClip explosionClip;
-
-    [Header("Bandit Death Sounds")]
-    public AudioClip banditDeathMaleClip;
-    public AudioClip banditDeathFemaleClip;
-
-    [Header("Bandit Taunts")]
+    [Header("FX")]
+    public AudioClip gunshotClip, explosionClip;
+    public AudioClip banditDeathMale, banditDeathFemale;
     public AudioClip[] banditTaunts;
-
-    [Header("Footsteps (Walking)")]
-    public AudioClip[] walkingClips; // assign 2–4 clips only
-    [Range(0f, 1f)] public float walkingVolume = 0.5f;
+    public AudioClip[] walkClips;
+    [Range(0,1)] public float walkVol = 0.5f;
 
     private AudioSource ambientSource;
     private AudioSource musicSource;
 
-    private void Awake()
+    void Awake()
     {
-        // Singleton setup
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (!Instance) { Instance = this; DontDestroyOnLoad(gameObject); }
+        else { Destroy(gameObject); return; }
 
-        // Ambient music setup
-        if (ambientClip != null)
+        if (ambientClip)
         {
             ambientSource = gameObject.AddComponent<AudioSource>();
             ambientSource.clip = ambientClip;
             ambientSource.loop = true;
-            ambientSource.volume = ambientVolume;
-            ambientSource.spatialBlend = 0f; // non-3D
+            ambientSource.volume = ambientVol;
+            ambientSource.spatialBlend = 0f;
             ambientSource.Play();
         }
 
-        // Music source setup
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.loop = true;
-        musicSource.volume = musicVolume;
+        musicSource.volume = musicVol;
         PlayMusic(defaultTrack);
     }
 
-    // --- Dynamic Music ---
     public void PlayMusic(AudioClip clip)
     {
-        if (clip == null || musicSource.clip == clip) return;
-
+        if (!clip || musicSource.clip == clip) return;
         musicSource.Stop();
         musicSource.clip = clip;
         musicSource.Play();
@@ -79,41 +55,24 @@ public class SoundManager : MonoBehaviour
     public void PlaySuspenseMusic() => PlayMusic(suspenseTrack);
     public void PlayFightMusic() => PlayMusic(fightTrack);
 
-    // --- SFX ---
-    public void PlaySound(AudioClip clip, Vector3 position, float volume = 1f)
+    public void PlaySound(AudioClip clip, Vector3 pos, float vol = 1f)
     {
-        if (clip != null)
-            AudioSource.PlayClipAtPoint(clip, position, volume);
+        if (clip) AudioSource.PlayClipAtPoint(clip, pos, vol);
     }
 
-    public void PlayGunshot(Vector3 position)
+    public void PlayGunshot(Vector3 pos) { PlaySound(gunshotClip, pos); PlayFightMusic(); }
+    public void PlayExplosion(Vector3 pos) { PlaySound(explosionClip, pos); PlayFightMusic(); }
+    public void PlayWalking(Vector3 pos)
     {
-        PlaySound(gunshotClip, position);
-        PlayFightMusic(); // trigger fight music when shooting
+        if (walkClips.Length == 0) return;
+        int i = Random.Range(0, walkClips.Length);
+        PlaySound(walkClips[i], pos, walkVol);
     }
 
-    public void PlayExplosion(Vector3 position)
-    {
-        PlaySound(explosionClip, position);
-        PlayFightMusic(); // optional: trigger fight music
-    }
-
-    public void PlayWalking(Vector3 position)
-    {
-        if (walkingClips.Length == 0) return;
-        int index = Random.Range(0, walkingClips.Length);
-        PlaySound(walkingClips[index], position, walkingVolume);
-    }
-
-    public void PlayBanditDeath(Vector3 position, bool isFemale)
-    {
-        PlaySound(isFemale ? banditDeathFemaleClip : banditDeathMaleClip, position);
-    }
-
-    public void PlayBanditTaunt(Vector3 position)
+    public void PlayBanditDeath(Vector3 pos, bool female) => PlaySound(female ? banditDeathFemale : banditDeathMale, pos);
+    public void PlayBanditTaunt(Vector3 pos)
     {
         if (banditTaunts.Length == 0) return;
-        int index = Random.Range(0, banditTaunts.Length);
-        PlaySound(banditTaunts[index], position);
+        PlaySound(banditTaunts[Random.Range(0, banditTaunts.Length)], pos);
     }
 }

@@ -6,11 +6,11 @@ public class Bullet : MonoBehaviour
     public float speed = 60f;
     public float lifeTime = 5f;
 
-    public GameObject explosionPrefab; // particle system prefab
-    public GameObject debrisPrefab;    // broken barrel prefab
+    public GameObject explosionPrefab;
+    public GameObject debrisPrefab;
 
-    public float explosionForce = 500f;
-    public float explosionRadius = 5f;
+    public float force = 500f;
+    public float radius = 5f;
 
     private Rigidbody rb;
 
@@ -23,48 +23,33 @@ public class Bullet : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        Bandit bandit = other.GetComponentInParent<Bandit>();
-        if (bandit != null)
-        {
-            bandit.Die();
-        }
+        Bandit b = other.GetComponentInParent<Bandit>();
+        if (b != null) b.Die();
 
-        // Barrel logic
         if (other.CompareTag("Barrel"))
-        {
             StartCoroutine(ExplodeBarrel(other.gameObject));
-        }
 
         Destroy(gameObject);
     }
 
     IEnumerator ExplodeBarrel(GameObject barrel)
     {
-        // Spawn explosion effect immediately
-        GameObject explosion = Instantiate(explosionPrefab, barrel.transform.position, Quaternion.identity);
-
-        // Play explosion sound
+        GameObject expl = Instantiate(explosionPrefab, barrel.transform.position, Quaternion.identity);
         SoundManager.Instance.PlayExplosion(barrel.transform.position);
-
-        // Spawn debris immediately
         Instantiate(debrisPrefab, barrel.transform.position, barrel.transform.rotation);
 
-        // Apply physics explosion to nearby rigidbodies
-        Collider[] colliders = Physics.OverlapSphere(barrel.transform.position, explosionRadius);
-        foreach (Collider hit in colliders)
+        Collider[] hits = Physics.OverlapSphere(barrel.transform.position, radius);
+        foreach (Collider h in hits)
         {
-            Rigidbody hitRb = hit.GetComponent<Rigidbody>();
-            if (hitRb != null)
-                hitRb.AddExplosionForce(explosionForce, barrel.transform.position, explosionRadius);
+            Rigidbody hrb = h.GetComponent<Rigidbody>();
+            if (hrb) hrb.AddExplosionForce(force, barrel.transform.position, radius);
         }
 
-        // Optional: wait until the particle system finishes
-        ParticleSystem ps = explosion.GetComponent<ParticleSystem>();
+        ParticleSystem ps = expl.GetComponent<ParticleSystem>();
         if (ps != null)
             yield return new WaitForSeconds(ps.main.duration);
 
-        // Destroy barrel and explosion effect
         Destroy(barrel);
-        Destroy(explosion);
+        Destroy(expl);
     }
 }
