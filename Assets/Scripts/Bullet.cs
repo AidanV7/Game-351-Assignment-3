@@ -5,49 +5,34 @@ public class Bullet : MonoBehaviour
 {
     public float speed = 60f;
     public float lifeTime = 5f;
-    
-    public GameObject explosionPrefab; // assign the particle system
-    public GameObject debrisPrefab;    // assign Broken Barrel
+
+    public GameObject explosionPrefab; // particle system prefab
+    public GameObject debrisPrefab;    // broken barrel prefab
+
+    public float explosionForce = 500f;
+    public float explosionRadius = 5f;
 
     private Rigidbody rb;
-    
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.velocity = transform.forward * speed;
-
         Destroy(gameObject, lifeTime);
     }
 
     void OnTriggerEnter(Collider other)
     {
-        Animator anim = other.GetComponentInParent<Animator>();
-
-        if (anim != null)
+        Bandit bandit = other.GetComponentInParent<Bandit>();
+        if (bandit != null)
         {
-            // Trigger death animation
-            anim.SetTrigger("Die");
+            bandit.Die();
+        }
 
-            // Play death sound if Bandit component exists
-            Bandit bandit = other.GetComponentInParent<Bandit>();
-            if (bandit != null)
-            {
-                SoundManager.Instance.PlayBanditDeath(anim.transform.position, bandit.isFemale);
-            }
-
-            // Stop physics and collisions
-            Rigidbody rb = anim.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.isKinematic = true;
-                rb.useGravity = false;
-            }
-
-            Collider col = anim.GetComponent<Collider>();
-            if (col != null)
-            {
-                col.enabled = false;
-            }
+        // Barrel logic
+        if (other.CompareTag("Barrel"))
+        {
+            StartCoroutine(ExplodeBarrel(other.gameObject));
         }
 
         Destroy(gameObject);
@@ -55,20 +40,30 @@ public class Bullet : MonoBehaviour
 
     IEnumerator ExplodeBarrel(GameObject barrel)
     {
-        // Spawn explosion effect
+        // Spawn explosion effect immediately
         GameObject explosion = Instantiate(explosionPrefab, barrel.transform.position, Quaternion.identity);
-
-        ParticleSystem ps = explosion.GetComponent<ParticleSystem>();
-        float waitTime = ps != null ? ps.main.duration : 1f;
 
         // Play explosion sound
         SoundManager.Instance.PlayExplosion(barrel.transform.position);
 
-        yield return new WaitForSeconds(waitTime);
-
-        // Spawn debris
+        // Spawn debris immediately
         Instantiate(debrisPrefab, barrel.transform.position, barrel.transform.rotation);
 
+        // Apply physics explosion to nearby rigidbodies
+        Collider[] colliders = Physics.OverlapSphere(barrel.transform.position, explosionRadius);
+        foreach (Collider hit in colliders)
+        {
+            Rigidbody hitRb = hit.GetComponent<Rigidbody>();
+            if (hitRb != null)
+                hitRb.AddExplosionForce(explosionForce, barrel.transform.position, explosionRadius);
+        }
+
+        // Optional: wait until the particle system finishes
+        ParticleSystem ps = explosion.GetComponent<ParticleSystem>();
+        if (ps != null)
+            yield return new WaitForSeconds(ps.main.duration);
+
+        // Destroy barrel and explosion effect
         Destroy(barrel);
         Destroy(explosion);
     }

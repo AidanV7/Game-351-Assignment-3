@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Bandit
   - Barrel
+  - Bullet
   layers:
   - Default
   - TransparentFX
