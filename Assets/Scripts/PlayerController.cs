@@ -22,7 +22,10 @@ public class PlayerController : MonoBehaviour
     public Transform firePoint;
     public float fireRate = 1f;
 
-    public GameObject hero;
+    [Header("First Person")]
+    public Camera playerCamera;      // assign your FPS camera here
+    public GameObject hero;          // your full-body mesh/rig
+    public LayerMask bodyLayer;      // assign a layer like "PlayerBody"
 
     private Animator anim;
     private Rigidbody rb;
@@ -32,6 +35,12 @@ public class PlayerController : MonoBehaviour
     {
         anim = hero.GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+
+        // Hide body from first-person camera
+        if (playerCamera)
+        {
+            playerCamera.cullingMask &= ~(1 << bodyLayer);
+        }
     }
 
     void Update()

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18145978, g: 0.22709113, b: 0.30739337, a: 1}
+  m_IndirectSpecularColor: {r: 0.18146001, g: 0.22709143, b: 0.3073942, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -23643,8 +23643,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFemale: 1
-  minTaunt: 2
-  maxTaunt: 6
+  minTaunt: 11.95
+  maxTaunt: 22.25
 --- !u!65 &796456569
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -26671,6 +26671,65 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 852821418}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &853481884
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 853481887}
+  - component: {fileID: 853481886}
+  - component: {fileID: 853481885}
+  m_Layer: 0
+  m_Name: Audio Trigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &853481885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 853481884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68be8270f04285649a0893c80a969cc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingMusic: {fileID: 8300000, guid: 33741693fcc0dd24284c2d770be2f841, type: 3}
+--- !u!65 &853481886
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 853481884}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 15.847999, y: 10.342697, z: 17.253574}
+  m_Center: {x: 1.1403165, y: 4.6713486, z: -0.41615486}
+--- !u!4 &853481887
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 853481884}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 34.89, y: -1.5594997, z: 11.45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &856423854
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39113,8 +39172,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFemale: 0
-  minTaunt: 2
-  maxTaunt: 6
+  minTaunt: 11.95
+  maxTaunt: 22.25
 --- !u!65 &1196770453
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -46852,7 +46911,11 @@ MonoBehaviour:
     type: 3}
   firePoint: {fileID: 1917372805}
   fireRate: 1
+  playerCamera: {fileID: 0}
   hero: {fileID: 803449927}
+  bodyLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!54 &1457821295
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -53576,11 +53639,11 @@ MonoBehaviour:
   defaultTrack: {fileID: 8300000, guid: 30189ce05c389e04f9b023dfbb66b910, type: 3}
   suspenseTrack: {fileID: 8300000, guid: 33741693fcc0dd24284c2d770be2f841, type: 3}
   fightTrack: {fileID: 8300000, guid: fccfa779691183446a548527e0ec3ec1, type: 3}
-  musicVol: 0.5
+  musicVol: 0.186
   gunshotClip: {fileID: 8300000, guid: 03530521776a5e14595948c2240f589f, type: 3}
   explosionClip: {fileID: 8300000, guid: 393f7c1854f0f1141b27d7ea53475a09, type: 3}
-  banditDeathMale: {fileID: 0}
-  banditDeathFemale: {fileID: 0}
+  banditDeathMale: {fileID: 8300000, guid: 817bcd2b65436f143a2a59bfcf3a3e25, type: 3}
+  banditDeathFemale: {fileID: 8300000, guid: feb5b3eb57a93624faa3f659e6f175f8, type: 3}
   banditTaunts:
   - {fileID: 8300000, guid: 0abda6df049ede34d9c472b9060aa92b, type: 3}
   - {fileID: 8300000, guid: 16b88dd860bb94a41993ee84d9d5d47f, type: 3}
@@ -54775,7 +54838,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1696711720}
   m_LocalRotation: {x: 0.07009234, y: -0.09921909, z: 0.007005662, w: 0.9925692}
-  m_LocalPosition: {x: 4.447464, y: 1.6225517, z: 2.9909668}
+  m_LocalPosition: {x: 4.43, y: 1.59, z: 3.04}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -65412,8 +65475,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFemale: 0
-  minTaunt: 2
-  maxTaunt: 6
+  minTaunt: 11.95
+  maxTaunt: 22.25
 --- !u!65 &1933754848
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -68126,8 +68189,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFemale: 0
-  minTaunt: 2
-  maxTaunt: 6
+  minTaunt: 11.95
+  maxTaunt: 22.25
 --- !u!64 &2033694763
 MeshCollider:
   m_ObjectHideFlags: 0
